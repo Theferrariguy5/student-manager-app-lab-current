@@ -1,6 +1,9 @@
 package ie.gmit.studentmanager;
 
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.File;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -13,6 +16,7 @@ public class Main extends Application implements Serializable {
 
 	private static final long serialVersionUID = 1L; // Used for serialization
 	StudentManager sm = new StudentManager(); // Used for managing students
+    private File StudentsDB;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -63,7 +67,29 @@ public class Main extends Application implements Serializable {
 
 			sm.deleteStudentById(tfStudentDel.getText());
 
-		});
+        });
+        //SAVE TO DB
+        Button btnSaveDB = new Button("Save Students to DB");
+        btnSaveDB.setOnAction(e -> {
+            if(sm.findTotalStudents()>0){
+
+            try{
+                File studentsDB = new File("./resources/studentsDB.ser");
+                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("studentsDB"));
+                out.writeObject(sm);
+                out.close();
+                taMyOutput.setText("Student Database Saved");
+			    
+            }catch(Exception exception){
+                taMyOutput.setText("Failed to save students to the Database");
+                System.out.print("[ERROR] Canny save DB mate cause u:");
+                exception.printStackTrace();
+                taMyOutput.setText("[ERROR] Faled to save student DB");
+            }
+        }else{
+            taMyOutput.setText("no students on list to save");
+            }
+        });
 
 		// Adding and arranging all the nodes in the grid - add(node, column, row)
 		GridPane gridPane1 = new GridPane();
@@ -72,8 +98,9 @@ public class Main extends Application implements Serializable {
 		gridPane1.add(btnShowTotal, 0, 1);
 		gridPane1.add(tfTotalNumberOfStudents, 1, 1);
 		gridPane1.add(tfStudentDel, 0, 2);
-		gridPane1.add(btnDelStudent, 1, 2);
-		gridPane1.add(taMyOutput, 0, 3, 2, 1);
+        gridPane1.add(btnDelStudent, 1, 2);
+        gridPane1.add(btnSaveDB, 0, 3);
+		gridPane1.add(taMyOutput, 0, 4, 2, 1);
 
 		// Preparing the Stage (i.e. the container of any JavaFX application)
 		// Create a Scene by passing the root group object, height and width
